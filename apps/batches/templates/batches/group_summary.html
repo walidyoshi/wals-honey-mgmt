@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Group {{ group_id }} Summary{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <nav class="flex mb-4" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'batches:list' %}" class="text-gray-700 hover:text-indigo-600">Batches</a>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="ml-1 text-gray-500 md:ml-2">Group {{ group_id }}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-800">Group Summary: {{ group_id }}</h1>
+        <div class="text-sm text-gray-500">{{ batches.count }} Jerrycan(s)</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Summary Cards -->
+    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total Cost</dt>
+        <dd class="mt-1 text-3xl font-semibold text-gray-900">₦{{ total_cost }}</dd>
+    </div>
+
+    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total 25cl Bottles</dt>
+        <dd class="mt-1 text-3xl font-semibold text-indigo-600">{{ total_bottles.b25 }}</dd>
+    </div>
+
+    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total 75cl Bottles</dt>
+        <dd class="mt-1 text-3xl font-semibold text-indigo-600">{{ total_bottles.b75 }}</dd>
+    </div>
+
+    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total 1L Bottles</dt>
+        <dd class="mt-1 text-3xl font-semibold text-indigo-600">{{ total_bottles.b1 }}</dd>
+    </div>
+</div>
+
+<div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Batches in this Group</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batch ID
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for batch in batches %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-indigo-600">
+                        <a href="{% url 'batches:detail' batch.pk %}">{{ batch.batch_id }}</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ batch.supply_date|date:"M d, Y" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ batch.source|default:"-" }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₦{{ batch.price }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{% url 'batches:detail' batch.pk %}"
+                            class="text-indigo-600 hover:text-indigo-900">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

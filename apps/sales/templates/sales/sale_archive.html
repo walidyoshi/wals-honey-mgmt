@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Archive Sale #{{ sale.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-10">
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Archive Sale #{{ sale.id }}</h3>
+            <div class="mt-2 max-w-xl text-sm text-gray-500">
+                <p>Are you sure you want to archive this sale for <strong>{{ sale.customer_name }}</strong>?</p>
+                <div class="mt-3 bg-yellow-50 p-3 rounded text-yellow-800 border border-yellow-200">
+                    <strong>Note:</strong> Archived sales are hidden from the main list but can be restored later. They
+                    do not count towards active revenue reports.
+                </div>
+            </div>
+            <div class="mt-5">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="{{ form.reason.id_for_label }}"
+                            class="block text-sm font-medium text-gray-700 mb-1">Reason for archiving <span
+                                class="text-red-500">*</span></label>
+                        {{ form.reason }}
+                        {% if form.reason.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.reason.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex justify-end">
+                        <a href="{% url 'sales:detail' sale.pk %}"
+                            class="mr-3 inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm">
+                            Cancel
+                        </a>
+                        <button type="submit"
+                            class="inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+                            Archive Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

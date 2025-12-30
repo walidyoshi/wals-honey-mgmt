@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Batches{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <h1 class="text-2xl font-bold text-gray-800">Honey Batches</h1>
+    <a href="{% url 'batches:create' %}"
+        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center shadow-sm">
+        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        New Batch
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-6">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Search ID</label>
+            <input type="text" name="search" value="{{ request.GET.search }}" placeholder="e.g. A24"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Group Filter</label>
+            <input type="text" name="group" value="{{ request.GET.group }}" placeholder="e.g. G02"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        </div>
+        <div class="flex items-end">
+            <button type="submit"
+                class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 w-full md:w-auto">
+                Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Batch List -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for batch in batches %}
+    <div
+        class="bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-100 flex flex-col h-full">
+        <div class="p-5 flex-1">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-indigo-600">
+                        <a href="{% url 'batches:detail' batch.pk %}" class="hover:underline">{{ batch.batch_id }}</a>
+                    </h3>
+                    <p class="text-xs text-gray-500">{{ batch.supply_date|date:"M d, Y" }}</p>
+                </div>
+                <span class="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded font-medium">
+                    {{ batch.total_bottles }} Bottles
+                </span>
+            </div>
+
+            <div class="space-y-2 text-sm text-gray-600">
+                <div class="flex justify-between">
+                    <span>Source:</span>
+                    <span class="font-medium text-gray-900 truncate max-w-[150px]">{{ batch.source|default:"-" }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Cost:</span>
+                    <span class="font-medium text-gray-900">₦{{ batch.price }}</span>
+                </div>
+            </div>
+
+            <!-- Bottle Breakdown -->
+            <div class="mt-4 grid grid-cols-4 gap-2 text-center text-xs">
+                <div class="bg-gray-50 p-1 rounded">
+                    <div class="font-bold text-gray-700">{{ batch.bottles_25cl }}</div>
+                    <div class="text-gray-400 text-[10px]">25cl</div>
+                </div>
+                <div class="bg-gray-50 p-1 rounded">
+                    <div class="font-bold text-gray-700">{{ batch.bottles_75cl }}</div>
+                    <div class="text-gray-400 text-[10px]">75cl</div>
+                </div>
+                <div class="bg-gray-50 p-1 rounded">
+                    <div class="font-bold text-gray-700">{{ batch.bottles_1L }}</div>
+                    <div class="text-gray-400 text-[10px]">1L</div>
+                </div>
+                <div class="bg-gray-50 p-1 rounded">
+                    <div class="font-bold text-gray-700">{{ batch.bottles_4L }}</div>
+                    <div class="text-gray-400 text-[10px]">4L</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 px-5 py-3 border-t border-gray-100 flex justify-between items-center text-sm">
+            {% if batch.group_number %}
+            <a href="{% url 'batches:group_summary' batch.group_number %}"
+                class="text-indigo-600 hover:text-indigo-900 text-xs font-medium">
+                View Group {{ batch.group_number }}
+            </a>
+            {% else %}
+            <span></span>
+            {% endif %}
+            <a href="{% url 'batches:detail' batch.pk %}" class="text-gray-500 hover:text-gray-700">Details &rarr;</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12 text-gray-500 bg-white rounded-lg border border-dashed border-gray-300">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <span class="mt-2 block text-sm font-medium text-gray-900">No batches found</span>
+        <a href="{% url 'batches:create' %}"
+            class="mt-3 inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+            Create New Batch
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="mt-6 flex justify-center">
+    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            Previous
+        </a>
+        {% endif %}
+        <span
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            Next
+        </a>
+        {% endif %}
+    </nav>
+</div>
+{% endif %}
+{% endblock %}

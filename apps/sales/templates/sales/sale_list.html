@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <h1 class="text-2xl font-bold text-gray-800">Sales Dashboard</h1>
+    <div class="flex space-x-3">
+        <a href="{% url 'sales:archived_list' %}"
+            class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 shadow-sm flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Archived
+        </a>
+        <a href="{% url 'sales:create' %}"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center shadow-sm">
+            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            New Sale
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-6">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Search Customer</label>
+            <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Search by name..."
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select name="status"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">All Statuses</option>
+                <option value="PAID" {% if request.GET.status=='PAID' %}selected{% endif %}>Fully Paid</option>
+                <option value="PARTIAL" {% if request.GET.status=='PARTIAL' %}selected{% endif %}>Partial</option>
+                <option value="UNPAID" {% if request.GET.status=='UNPAID' %}selected{% endif %}>Unpaid</option>
+            </select>
+        </div>
+        <div class="flex items-end">
+            <button type="submit" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 w-full">
+                Filter Results
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Sales List -->
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="hidden md:block">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for sale in sales %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ sale.sale_date|date:"M d, Y" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-indigo-600">
+                            <a href="{% url 'sales:detail' sale.pk %}">{{ sale.customer_name }}</a>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ sale.quantity }}x {{ sale.get_bottle_type_display }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        ₦{{ sale.total_price }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if sale.payment_status == 'PAID' %}bg-green-100 text-green-800
+                            {% elif sale.payment_status == 'PARTIAL' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ sale.get_payment_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{% url 'sales:detail' sale.pk %}"
+                            class="text-indigo-600 hover:text-indigo-900">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                        No active sales found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="md:hidden divide-y divide-gray-200">
+        {% for sale in sales %}
+        <div class="p-4 space-y-2">
+            <div class="flex justify-between items-start">
+                <div>
+                    <a href="{% url 'sales:detail' sale.pk %}" class="font-medium text-indigo-600">{{ sale.customer_name
+                        }}</a>
+                    <div class="text-xs text-gray-500">{{ sale.sale_date|date:"M d" }} • {{ sale.quantity }}x {{
+                        sale.bottle_type }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="font-bold text-gray-900">₦{{ sale.total_price }}</div>
+                    <span class="inline-flex text-[10px] leading-4 font-semibold rounded-full px-1.5 
+                        {% if sale.payment_status == 'PAID' %}bg-green-100 text-green-800
+                        {% elif sale.payment_status == 'PARTIAL' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ sale.get_payment_status_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="flex justify-end pt-2">
+                <a href="{% url 'sales:detail' sale.pk %}"
+                    class="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full">View Details</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="p-8 text-center text-gray-500">
+            No active sales found.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+        <!-- Pagination controls same as other views -->
+        <div class="flex justify-between items-center">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+            {% else %}
+            <span
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-300 bg-white cursor-not-allowed">Previous</span>
+            {% endif %}
+
+            <span class="text-sm text-gray-700">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
+            {% else %}
+            <span
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-300 bg-white cursor-not-allowed">Next</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
