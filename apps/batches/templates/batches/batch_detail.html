@@ -60,8 +60,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-500">Transport Cost</label>
-                    <div class="mt-1 text-sm text-gray-900">{% if batch.tp_cost %}₦{{ batch.tp_cost }}{% else %}-{%
-                        endif %}</div>
+                    <div class="mt-1 text-sm text-gray-900">{% if batch.tp_cost %}₦{{ batch.tp_cost }}{% else %}-{% endif %}</div>
                 </div>
                 <div class="col-span-1 sm:col-span-2">
                     <label class="block text-sm font-medium text-gray-500">Production Output</label>
