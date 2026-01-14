@@ -3,11 +3,22 @@ Forms for batch management
 """
 
 from django import forms
+from datetime import datetime
 from .models import Batch
 
 
 class BatchForm(forms.ModelForm):
     """Form for creating and updating batches"""
+    
+    # Override supply_date to use CharField to avoid Django's date widget validation
+    supply_date = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'type': 'text',
+            'placeholder': 'dd/mm/yyyy',
+            'class': 'date-input'
+        })
+    )
     
     class Meta:
         model = Batch
@@ -17,11 +28,6 @@ class BatchForm(forms.ModelForm):
             'notes'
         ]
         widgets = {
-            'supply_date': forms.DateInput(attrs={
-                'type': 'text',
-                'placeholder': 'dd/mm/yyyy',
-                'class': 'date-input'
-            }),
             'notes': forms.Textarea(attrs={'rows': 3}),
             'price': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
             'tp_cost': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
@@ -30,6 +36,23 @@ class BatchForm(forms.ModelForm):
             'bottles_1L': forms.NumberInput(attrs={'inputmode': 'numeric'}),
             'bottles_4L': forms.NumberInput(attrs={'inputmode': 'numeric'}),
         }
+    
+    def clean_supply_date(self):
+        """Parse dd/mm/yyyy format to date object"""
+        supply_date = self.data.get('supply_date', '')
+        
+        if not supply_date:
+            return None
+        
+        # Try to parse dd/mm/yyyy format
+        try:
+            return datetime.strptime(supply_date, '%d/%m/%Y').date()
+        except ValueError:
+            # If that fails, try other common formats
+            try:
+                return datetime.strptime(supply_date, '%Y-%m-%d').date()
+            except ValueError:
+                raise forms.ValidationError('Please enter a valid date in dd/mm/yyyy format')
     
     def clean(self):
         cleaned_data = super().clean()

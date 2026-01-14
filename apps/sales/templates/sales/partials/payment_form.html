@@ -23,8 +23,8 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Amount (₦)</label>
-                                <input type="number" name="amount" step="0.01" max="{{ sale.amount_due }}" required
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="text" inputmode="decimal" name="amount" max="{{ sale.amount_due }}" required
+                                    class="currency-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                 <p class="text-xs text-gray-500 mt-1">Max due: ₦{{ sale.amount_due }}</p>
                             </div>
 
