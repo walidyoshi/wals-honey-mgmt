@@ -25,6 +25,8 @@ class SaleForm(forms.ModelForm):
                 'autocomplete': 'off'
             }),
             'notes': forms.Textarea(attrs={'rows': 2}),
+            'unit_price': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
+            'quantity': forms.NumberInput(attrs={'inputmode': 'numeric'}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -42,6 +44,7 @@ class PaymentForm(forms.ModelForm):
         fields = ['amount', 'payment_method', 'notes']
         widgets = {
             'notes': forms.Textarea(attrs={'rows': 2}),
+            'amount': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
         }
     
     def __init__(self, sale=None, *args, **kwargs):

@@ -37,9 +37,9 @@
             <select name="status"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                 <option value="">All Statuses</option>
-                <option value="PAID" {% if request.GET.status=='PAID' %}selected{% endif %}>Fully Paid</option>
-                <option value="PARTIAL" {% if request.GET.status=='PARTIAL' %}selected{% endif %}>Partial</option>
-                <option value="UNPAID" {% if request.GET.status=='UNPAID' %}selected{% endif %}>Unpaid</option>
+                <option value="PAID" {% if request.GET.status == 'PAID' %}selected{% endif %}>Fully Paid</option>
+                <option value="PARTIAL" {% if request.GET.status == 'PARTIAL' %}selected{% endif %}>Partial</option>
+                <option value="UNPAID" {% if request.GET.status == 'UNPAID' %}selected{% endif %}>Unpaid</option>
             </select>
         </div>
         <div class="flex items-end">

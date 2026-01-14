@@ -104,6 +104,13 @@ TIME_ZONE = 'Africa/Lagos'
 USE_I18N = True
 USE_TZ = True
 
+# Date input formats (dd/mm/yyyy)
+DATE_INPUT_FORMATS = [
+    '%d/%m/%Y',  # 12/01/2026
+    '%d-%m-%Y',  # 12-01-2026
+    '%Y-%m-%d',  # 2026-01-12 (fallback)
+]
+
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']

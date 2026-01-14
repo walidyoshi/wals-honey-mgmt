@@ -17,8 +17,18 @@ class BatchForm(forms.ModelForm):
             'notes'
         ]
         widgets = {
-            'supply_date': forms.DateInput(attrs={'type': 'date'}),
+            'supply_date': forms.DateInput(attrs={
+                'type': 'text',
+                'placeholder': 'dd/mm/yyyy',
+                'class': 'date-input'
+            }),
             'notes': forms.Textarea(attrs={'rows': 3}),
+            'price': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
+            'tp_cost': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
+            'bottles_25cl': forms.NumberInput(attrs={'inputmode': 'numeric'}),
+            'bottles_75cl': forms.NumberInput(attrs={'inputmode': 'numeric'}),
+            'bottles_1L': forms.NumberInput(attrs={'inputmode': 'numeric'}),
+            'bottles_4L': forms.NumberInput(attrs={'inputmode': 'numeric'}),
         }
     
     def clean(self):

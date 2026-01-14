@@ -13,8 +13,13 @@ class ExpenseForm(forms.ModelForm):
         model = Expense
         fields = ['item', 'cost', 'expense_date', 'notes']
         widgets = {
-            'expense_date': forms.DateInput(attrs={'type': 'date'}),
+            'expense_date': forms.DateInput(attrs={
+                'type': 'text',
+                'placeholder': 'dd/mm/yyyy',
+                'class': 'date-input'
+            }),
             'notes': forms.Textarea(attrs={'rows': 3}),
+            'cost': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
         }
 
 
