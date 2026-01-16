@@ -43,12 +43,15 @@ class CustomerDetailView(LoginRequiredMixin, DetailView):
 class CustomerAutocompleteView(LoginRequiredMixin, ListView):
     """HTMX endpoint for customer autocomplete"""
     model = Customer
+    template_name = 'customers/partials/autocomplete_results.html'
+    context_object_name = 'customers'
     
-    def get(self, request, *args, **kwargs):
-        query = request.GET.get('q', '')
-        customers = Customer.objects.filter(
-            is_deleted=False,
-            name__icontains=query
-        ).values('id', 'name')[:10]
-        
-        return JsonResponse(list(customers), safe=False)
+    def get_queryset(self):
+        # HTMX sends the input value with the field name 'customer_name'
+        query = self.request.GET.get('customer_name', '')
+        if query:
+            return Customer.objects.filter(
+                is_deleted=False,
+                name__icontains=query
+            )[:10]
+        return Customer.objects.none()

@@ -122,10 +122,8 @@
         <div class="p-4 space-y-2">
             <div class="flex justify-between items-start">
                 <div>
-                    <a href="{% url 'sales:detail' sale.pk %}" class="font-medium text-indigo-600">{{ sale.customer_name
-                        }}</a>
-                    <div class="text-xs text-gray-500">{{ sale.sale_date|date:"M d" }} • {{ sale.quantity }}x {{
-                        sale.bottle_type }}</div>
+                    <a href="{% url 'sales:detail' sale.pk %}" class="font-medium text-indigo-600">{{ sale.customer_name }}</a>
+                    <div class="text-xs text-gray-500">{{ sale.sale_date|date:"M d" }} • {{ sale.quantity }}x {{ sale.bottle_type }}</div>
                 </div>
                 <div class="text-right">
                     <div class="font-bold text-gray-900">₦{{ sale.total_price }}</div>

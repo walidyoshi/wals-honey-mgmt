@@ -1,0 +1,10 @@
+{% if customers %}
+{% for customer in customers %}
+<div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer text-sm text-gray-900 border-b border-gray-100 last:border-b-0"
+     onclick="document.getElementById('id_customer_name').value = '{{ customer.name }}'; document.getElementById('customer-results').innerHTML = '';">
+    {{ customer.name }}
+</div>
+{% endfor %}
+{% else %}
+<div class="px-4 py-2 text-sm text-gray-500">No customers found</div>
+{% endif %}

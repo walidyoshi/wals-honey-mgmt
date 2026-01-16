@@ -67,8 +67,7 @@
         {% for customer in customers %}
         <div class="p-4 space-y-2">
             <div class="flex justify-between items-start">
-                <a href="{% url 'customers:detail' customer.pk %}" class="font-medium text-indigo-600">{{ customer.name
-                    }}</a>
+                <a href="{% url 'customers:detail' customer.pk %}" class="font-medium text-indigo-600">{{ customer.name }}</a>
                 <span class="text-xs text-gray-500">{{ customer.created_at|date:"M d" }}</span>
             </div>
             <div class="flex justify-end pt-2">
