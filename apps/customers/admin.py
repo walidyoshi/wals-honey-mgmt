@@ -1,5 +1,10 @@
 """
-Admin configuration for customers app
+Customers Admin Configuration
+
+Customizes the Django admin interface for the Customer model.
+
+Admin Classes:
+- CustomerAdmin: Management interface for Customer records.
 """
 
 from django.contrib import admin
@@ -8,7 +13,14 @@ from .models import Customer
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    """Customer admin configuration"""
+    """
+    Admin interface for Customer model.
+    
+    Features:
+        - Shows creation metadata (created_by, created_at).
+        - Allows filtering by deleted status.
+        - Organizes fields into collapsible sections for cleaner UI.
+    """
     list_display = ['name', 'created_at', 'created_by', 'is_deleted']
     list_filter = ['is_deleted', 'created_at']
     search_fields = ['name']

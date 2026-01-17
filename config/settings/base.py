@@ -1,12 +1,15 @@
 """
 Django settings for honey_mgmt project.
 Base settings shared across all environments.
+
+This file contains the core configuration for the Django project, including
+installed apps, middleware, authentication, and static file configuration.
 """
 
 from pathlib import Path
 import environ
 
-# Build paths inside the project
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Initialize environment variables
@@ -23,10 +26,12 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-temporary-key-change-in-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
+# Allowed hosts for production security
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 # Application definition
 INSTALLED_APPS = [
+    # Default Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,26 +41,26 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     
     # Third-party apps
-    'django_htmx',
+    'django_htmx',  # For dynamic frontend interactions
     
-    # Local apps
-    'apps.core',
-    'apps.accounts',
-    'apps.customers',
-    'apps.batches',
-    'apps.sales',
-    'apps.expenses',
+    # Local apps (modular architecture)
+    'apps.core',      # Shared utilities
+    'apps.accounts',  # User/Auth
+    'apps.customers', # Customer Data
+    'apps.batches',   # Inventory
+    'apps.sales',     # POS/Transactions
+    'apps.expenses',  # Financials
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Static file serving
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_htmx.middleware.HtmxMiddleware',
-    'apps.core.middleware.UserTrackingMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',      # HTMX support
+    'apps.core.middleware.UserTrackingMiddleware',# Custom: Track current user
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -65,7 +70,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'templates'], # Global templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,6 +111,7 @@ USE_I18N = True
 USE_TZ = True
 
 # Date input formats (dd/mm/yyyy)
+# Prioritizes European/African date format for user inputs
 DATE_INPUT_FORMATS = [
     '%d/%m/%Y',  # 12/01/2026
     '%d-%m-%Y',  # 12-01-2026

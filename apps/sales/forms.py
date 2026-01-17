@@ -1,5 +1,12 @@
 """
-Forms for sales management
+Sales Forms
+
+This module handles Sales and Payment data entry forms.
+
+Forms:
+- SaleForm: Main transaction form with HTMX autocomplete.
+- PaymentForm: For adding portions of payment with validation.
+- ArchiveSaleForm: Captures reason for soft-deleting a sale.
 """
 
 from django import forms
@@ -8,7 +15,14 @@ from apps.batches.models import Batch
 
 
 class SaleForm(forms.ModelForm):
-    """Form for recording a new sale"""
+    """
+    Form for creating/updating a Sale.
+    
+    Features:
+        - HTMX Autocomplete: 'customer_name' field polls /customers/autocomplete/
+        - Dynamic Batch Filtering: Shows available batches.
+        - Numeric Keypads: Uses 'inputmode' for mobile friendliness.
+    """
     
     class Meta:
         model = Sale
@@ -30,14 +44,19 @@ class SaleForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        """Initialize form and filter batch queryset."""
         super().__init__(*args, **kwargs)
         # Only show batches with stock available (simplified logic)
-        # In a real app we'd filter this more strictly based on bottle counts
         self.fields['batch'].queryset = Batch.objects.all().order_by('-supply_date')
 
 
 class PaymentForm(forms.ModelForm):
-    """Form for adding payments"""
+    """
+    Form for recording a payment.
+    
+    Validation:
+        - Ensures payment amount does not exceed the remaining balance on the sale.
+    """
     
     class Meta:
         model = Payment
@@ -48,10 +67,25 @@ class PaymentForm(forms.ModelForm):
         }
     
     def __init__(self, sale=None, *args, **kwargs):
+        """
+        Initialize with the parent Sale instance.
+        
+        Args:
+            sale (Sale): The sale this payment belongs to.
+        """
         self.sale = sale
         super().__init__(*args, **kwargs)
         
     def clean_amount(self):
+        """
+        Validate that the payment amount is not greater than what is owed.
+        
+        Returns:
+            Decimal: Validated amount.
+            
+        Raises:
+            ValidationError: If amount > amount_due.
+        """
         amount = self.cleaned_data['amount']
         if self.sale:
             if amount > self.sale.amount_due:
@@ -60,7 +94,7 @@ class PaymentForm(forms.ModelForm):
 
 
 class ArchiveSaleForm(forms.Form):
-    """Form for soft deleting/archiving a sale"""
+    """Simple form to enforce providing a reason when deleting a sale."""
     reason = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Reason for deletion required'}),
         required=True

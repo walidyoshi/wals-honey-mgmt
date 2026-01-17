@@ -1,71 +1,60 @@
-# Wals Honey Management System
+# Wals Honey Management System 🍯
 
-A comprehensive Django-based management system for honey bottling and distribution.
+The **Wals Honey Management System** is a comprehensive solution designed to streamline honey inventory, sales, and expense tracking. It provides end-to-end visibility from batch acquisition to final sale, ensuring accurate inventory management and financial reporting.
 
-## Features
-
-*   **Modular Architecture**: Separate apps for Accounts, Customers, Batches, Sales, and Expenses.
-*   **User Tracking**: Automatic tracking of who created or modified any record.
-*   **Audit Trail**: Detailed change history for critical models (batches, sales, customers).
-*   **Soft Deletes**: Sales and expenses are archived instead of permanently deleted, with restore capability.
-*   **Mobile-First Design**: Responsive UI built with Tailwind CSS.
-*   **Dynamic UX**: HTMX integration for modal forms and autocompletes without page reloads.
+## Key Features
+- **Batch Tracking**: Precise tracking of honey batches, including source and individual jerrycan details.
+- **Inventory Management**: Real-time stock levels and automated status updates.
+- **Sales & Payment Tracking**: Transaction recording with partial payment support, customer auto-creation, and complete payment history.
+- **Financial Tracking**: Expense logging and financial health monitoring.
+- **Audit Trail**: Detailed logging of all critical actions for accountability.
+- **Mobile-First Design**: Optimized for use on tablets and mobile devices in the field.
 
 ## Quick Start
+Get the system up and running in minutes:
 
-### Prerequisites
-*   Python 3.10+
-*   PostgreSQL (recommended) or SQLite (dev)
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd wals-honey-mgmt
+    ```
 
-### Installation
-
-1.  **Clone the repository** (if applicable)
-
-2.  **Create a virtual environment**
+2.  **Set up the environment:**
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
-    ```
-
-3.  **Install dependencies**
-    ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Configure Environment**
-    Copy `.env.example` to `.env` and update the values:
-    ```bash
-    cp .env.example .env
-    ```
-    Set `DEBUG=True` for local development.
+3.  **Configure environment variables:**
+    Copy `.env.example` to `.env` and set your secret key and database settings.
 
-5.  **Run Migrations**
+4.  **Initialize the database:**
     ```bash
-    python manage.py makemigrations
     python manage.py migrate
-    ```
-
-6.  **Create Superuser**
-    ```bash
     python manage.py createsuperuser
     ```
 
-7.  **Run Server**
+5.  **Run the server:**
     ```bash
     python manage.py runserver
     ```
 
-## App Structure
+## Documentation
+For more detailed information, please refer to the documentation:
+- [Setup Guide](docs/setup.md)
+- [Architecture Overview](docs/architecture.md)
+- [Business Logic & Workflows](docs/business_logic.md)
+- [Deployment Guide](docs/deployment.md)
 
-*   `apps/core`: Base models, middleware, and common utilities.
-*   `apps/accounts`: Custom user model and authentication.
-*   `apps/customers`: Customer management with purchase history.
-*   `apps/batches`: Jerrycan tracking and production output.
-*   `apps/sales`: Transaction recording, payments, and invoices.
-*   `apps/expenses`: Business expense tracking.
+## Tech Stack
+- **Backend**: Django (Python)
+- **Database**: PostgreSQL (Production) / SQLite (Development)
+- **Frontend**: Django Templates, Vanilla CSS/JS, HTMX (for dynamic interactions)
+- **Deployment**: Render.com, Supabase(Might go with a different option at deployment stage)
 
-## Key Design Decisions
+## Team
+Developed by the Walid Mahmud.
 
-*   **Signals**: Used for audit logging and keeping payment statuses in sync.
-*   **Middleware**: `UserTrackingMiddleware` ensures every action is attributed to a user.
-*   **Templates**: Base template uses Alpine.js for the sidebar and HTMX for interactions.
+## License
+Proprietary software. All rights reserved.

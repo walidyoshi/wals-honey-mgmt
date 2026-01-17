@@ -1,5 +1,11 @@
 """
-Signals for sales and payment tracking
+Sales Signals
+
+This module manages automated updates for Sales.
+
+Signals:
+- update_sale_payment_status: Ensures Sale status (PAID/UNPAID) matches real-time payments.
+- track_sale_changes: Audits changes to critical sale terms.
 """
 
 from django.db.models.signals import post_save, post_delete, pre_save
@@ -12,13 +18,27 @@ from apps.batches.models import AuditLog
 @receiver(post_save, sender=Payment)
 @receiver(post_delete, sender=Payment)
 def update_sale_payment_status(sender, instance, **kwargs):
-    """Auto-update sale payment status when payment added/deleted"""
+    """
+    Trigger re-calculation of Sale payment status whenever a Payment is saved or deleted.
+    
+    Args:
+        sender: The Payment class.
+        instance: The payment record.
+    """
     instance.sale.update_payment_status()
 
 
 @receiver(pre_save, sender=Sale)
 def track_sale_changes(sender, instance, **kwargs):
-    """Track changes to sale fields"""
+    """
+    Record changes to sensitive Sale fields in the Audit Log.
+    
+    Fields Tracked:
+        - Price, Quantity, Bottle Type, Customer Name.
+        
+    Triggered:
+        Before Sale is saved.
+    """
     if instance.pk:
         try:
             old_instance = Sale.objects.get(pk=instance.pk)

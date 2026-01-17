@@ -1,5 +1,10 @@
 """
-Signals for batch change tracking
+Batches Signals
+
+This module handles automatic side-effects for Batch operations, specifically audit logging.
+
+Signals:
+- track_batch_changes: Listens for pre_save events to record field modifications.
 """
 
 from django.db.models.signals import pre_save
@@ -10,7 +15,27 @@ from .models import Batch, AuditLog
 
 @receiver(pre_save, sender=Batch)
 def track_batch_changes(sender, instance, **kwargs):
-    """Track changes to batch fields"""
+    """
+    Compare old and new values of a Batch before saving and create AuditLog entries.
+    
+    Triggered:
+        Before a Batch instance is saved (pre_save).
+    
+    Args:
+        sender: The Batch class.
+        instance: The specific batch being saved.
+        **kwargs: Signal arguments.
+    
+    Logic:
+        1. Checks if instance has a PK (update vs create).
+        2. If update, fetches the *original* version from DB.
+        3. Iterates through sensitive fields (bottles, price, etc.).
+        4. If a difference is found, creates an AuditLog record.
+        
+    Attribution:
+        Records who made the change via 'instance.modified_by', which is populated
+        by UserTrackingMiddleware/UserTrackingModel before this signal fires.
+    """
     if instance.pk:  # Only for updates
         try:
             old_instance = Batch.objects.get(pk=instance.pk)

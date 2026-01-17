@@ -1,5 +1,13 @@
 """
-Expense management views
+Expenses Views
+
+This module manages the viewing, creating, and editing of expenses.
+
+Views:
+- ExpenseListView: Filterable list of expenses.
+- ExpenseCreateView: Add new expense.
+- ExpenseArchiveView: Soft-delete an expense.
+- RestoreExpenseView: Undo soft-delete.
 """
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,13 +20,29 @@ from .forms import ExpenseForm, ArchiveExpenseForm
 
 
 class ExpenseListView(LoginRequiredMixin, ListView):
-    """List all active expenses with filtering"""
+    """
+    Display list of active expenses.
+    
+    URL: /expenses/
+    Template: expenses/expense_list.html
+    
+    Filters (GET params):
+        - search: Text search on 'item' description.
+        - date_from, date_to: Range filtering on 'expense_date'.
+    """
     model = Expense
     template_name = 'expenses/expense_list.html'
     context_object_name = 'expenses'
     paginate_by = 50
     
     def get_queryset(self):
+        """
+        Return filtered queryset.
+        
+        Logic:
+            - Applies search filter if present.
+            - Applies date range filter if present.
+        """
         queryset = Expense.objects.all()  # Default manager excludes deleted
         
         # Search
@@ -38,7 +62,12 @@ class ExpenseListView(LoginRequiredMixin, ListView):
 
 
 class ExpenseCreateView(LoginRequiredMixin, CreateView):
-    """Add a new expense"""
+    """
+    Add a new expense.
+    
+    URL: /expenses/add/
+    Form: ExpenseForm
+    """
     model = Expense
     form_class = ExpenseForm
     template_name = 'expenses/expense_form.html'
@@ -46,14 +75,23 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
 
 
 class ExpenseDetailView(LoginRequiredMixin, DetailView):
-    """View expense details"""
+    """
+    View expense details.
+    
+    URL: /expenses/<pk>/
+    """
     model = Expense
     template_name = 'expenses/expense_detail.html'
     context_object_name = 'expense'
 
 
 class ExpenseUpdateView(LoginRequiredMixin, UpdateView):
-    """Update expense details"""
+    """
+    Update an existing expense.
+    
+    URL: /expenses/<pk>/edit/
+    Form: ExpenseForm
+    """
     model = Expense
     form_class = ExpenseForm
     template_name = 'expenses/expense_form.html'
@@ -61,7 +99,11 @@ class ExpenseUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class ExpenseArchiveView(LoginRequiredMixin, FormView):
-    """Soft delete an expense"""
+    """
+    Soft-delete an expense.
+    
+    URL: /expenses/<pk>/delete/
+    """
     form_class = ArchiveExpenseForm
     template_name = 'expenses/expense_archive.html'
     
@@ -82,7 +124,11 @@ class ExpenseArchiveView(LoginRequiredMixin, FormView):
 
 
 class ExpenseArchivedListView(LoginRequiredMixin, ListView):
-    """List archived/deleted expenses"""
+    """
+    List soft-deleted expenses.
+    
+    URL: /expenses/archived/
+    """
     model = Expense
     template_name = 'expenses/expense_archived_list.html'
     context_object_name = 'expenses'
@@ -93,7 +139,11 @@ class ExpenseArchivedListView(LoginRequiredMixin, ListView):
 
 
 class RestoreExpenseView(LoginRequiredMixin, View):
-    """Restore an archived expense"""
+    """
+    Restore a soft-deleted expense.
+    
+    Method: POST
+    """
     def post(self, request, pk):
         expense = get_object_or_404(Expense.archived.all(), pk=pk)
         expense.restore()

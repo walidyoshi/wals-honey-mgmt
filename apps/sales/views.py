@@ -1,5 +1,13 @@
 """
-Sales management views
+Sales Views
+
+This module manages the Sales workflow, including list, create, update, and special archival views.
+
+Views:
+- SaleListView: browsable sales history.
+- SaleCreateView: POST entry for new sales.
+- SaleArchiveView: Handles soft-deletion with reason capture.
+- PaymentCreateView: HTMX-powered modal for adding payments.
 """
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -14,14 +22,24 @@ from .forms import SaleForm, PaymentForm, ArchiveSaleForm
 
 
 class SaleListView(LoginRequiredMixin, ListView):
-    """List all active sales with filters"""
+    """
+    Display a list of active sales.
+    
+    URL: /sales/
+    Template: sales/sale_list.html
+    
+    Filters:
+        - search: Customer name.
+        - status: Payment status (PAID/UNPAID).
+    """
     model = Sale
     template_name = 'sales/sale_list.html'
     context_object_name = 'sales'
     paginate_by = 50
     
     def get_queryset(self):
-        queryset = Sale.objects.all()  # Manager excludes deleted by default
+        """Apply filters to the default queryset (which already excludes deleted items)."""
+        queryset = Sale.objects.all()
         
         # Filtering
         customer = self.request.GET.get('search')
@@ -36,7 +54,12 @@ class SaleListView(LoginRequiredMixin, ListView):
 
 
 class SaleCreateView(LoginRequiredMixin, CreateView):
-    """Record a new sale"""
+    """
+    Create a new Sale.
+    
+    URL: /sales/add/
+    Form: SaleForm
+    """
     model = Sale
     form_class = SaleForm
     template_name = 'sales/sale_form.html'
@@ -44,14 +67,22 @@ class SaleCreateView(LoginRequiredMixin, CreateView):
 
 
 class SaleDetailView(LoginRequiredMixin, DetailView):
-    """View sale details, payments and history"""
+    """
+    View sale details, including payment history and audit logs.
+    
+    URL: /sales/<pk>/
+    """
     model = Sale
     template_name = 'sales/sale_detail.html'
     context_object_name = 'sale'
 
 
 class SaleUpdateView(LoginRequiredMixin, UpdateView):
-    """Update sale details"""
+    """
+    Evaluate and update a sale.
+    
+    URL: /sales/<pk>/edit/
+    """
     model = Sale
     form_class = SaleForm
     template_name = 'sales/sale_form.html'
@@ -61,11 +92,19 @@ class SaleUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class SaleArchiveView(LoginRequiredMixin, FormView):
-    """Soft delete a sale"""
+    """
+    Soft-delete a sale.
+    
+    Step:
+        1. User clicks delete.
+        2. Form prompts for 'Reason'.
+        3. On valid submit, calls sale.soft_delete().
+    """
     form_class = ArchiveSaleForm
     template_name = 'sales/sale_archive.html'
     
     def setup(self, request, *args, **kwargs):
+        """Initialize the sale object from URL pk."""
         super().setup(request, *args, **kwargs)
         self.sale = get_object_or_404(Sale, pk=kwargs['pk'])
         
@@ -75,6 +114,7 @@ class SaleArchiveView(LoginRequiredMixin, FormView):
         return context
         
     def form_valid(self, form):
+        """Execute soft delete logic."""
         reason = form.cleaned_data['reason']
         self.sale.soft_delete(self.request.user, reason)
         messages.success(self.request, f"Sale #{self.sale.pk} archived successfully.")
@@ -82,18 +122,27 @@ class SaleArchiveView(LoginRequiredMixin, FormView):
 
 
 class SaleArchivedListView(LoginRequiredMixin, ListView):
-    """List archived/deleted sales"""
+    """
+    Separate list view for archived (deleted) sales.
+    
+    URL: /sales/archived/
+    """
     model = Sale
     template_name = 'sales/sale_archived_list.html'
     context_object_name = 'sales'
     paginate_by = 50
     
     def get_queryset(self):
+        """Use the custom 'archived' manager."""
         return Sale.archived.all().order_by('-deleted_at')
 
 
 class RestoreSaleView(LoginRequiredMixin, View):
-    """Restore an archived sale"""
+    """
+    Action to restore a soft-deleted sale.
+    
+    Method: POST only.
+    """
     def post(self, request, pk):
         sale = get_object_or_404(Sale.archived.all(), pk=pk)
         sale.restore()
@@ -102,7 +151,14 @@ class RestoreSaleView(LoginRequiredMixin, View):
 
 
 class PaymentCreateView(LoginRequiredMixin, CreateView):
-    """Add payment via HTMX modal"""
+    """
+    HTMX-compatible view to add a payment.
+    
+    Behavior:
+        - Validates PaymentForm.
+        - On success, returns a partial HTML update (payment_list.html)
+          re-rendering the payment history table without a full page reload.
+    """
     model = Payment
     form_class = PaymentForm
     template_name = 'sales/partials/payment_form.html'

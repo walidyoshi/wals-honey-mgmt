@@ -1,5 +1,17 @@
 """
-Sales and Payment models
+Sales Models
+
+This module handles Sales transactions, Payments, and logical status updates.
+
+Business Logic:
+- A Sale represents a transaction with a Customer for a specific quantity of honey from a Batch.
+- Sales have a computed 'payment_status' (UNPAID, PARTIAL, PAID) based on associated Payments.
+- Sales can be 'soft-deleted' (archived) to preserve audit trails while hiding them from main reports.
+- Customers can be auto-created during sale creation if they don't exist.
+
+Models:
+- Sale: The transaction header.
+- Payment: Individual payments against a Sale.
 """
 
 from django.db import models
@@ -9,19 +21,51 @@ from apps.core.models import UserTrackingModel
 
 
 class SaleManager(models.Manager):
-    """Custom manager to exclude deleted sales by default"""
+    """
+    Default manager for Sale model.
+    
+    Behavior:
+        Excludes soft-deleted sales from standard queries to prevent them from
+        affecting reports and lists.
+    """
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
 
 
 class ArchivedSaleManager(models.Manager):
-    """Manager to find deleted sales"""
+    """
+    Manager to retrieve only soft-deleted sales.
+    
+    Usage:
+        Sale.archived.all()
+    """
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=True)
 
 
 class Sale(UserTrackingModel):
-    """Sales transaction record with soft delete support"""
+    """
+    Represents a sales transaction with a customer.
+    
+    Attributes:
+        customer (Customer): Link to existing Customer (optional if just starting).
+        customer_name (CharField): Name snapshot.
+        bottle_type (CharField): Size of container sold (25CL, 75CL, etc.).
+        unit_price (DecimalField): Price per unit.
+        quantity (int): Number of units.
+        total_price (DecimalField): Auto-calculated (unit_price * quantity).
+        batch (Batch): Inventory source.
+        payment_status (CharField): UNPAID, PARTIAL, or PAID.
+        is_wholesale (bool): Flag for bulk pricing/logic.
+        
+        is_deleted (bool): Soft-delete flag.
+        deleted_at (DateTimeField): When it was deleted.
+        deleted_reason (TextField): Why it was deleted.
+    
+    Computed Properties:
+        amount_paid: Sum of all related payments.
+        amount_due: total_price - amount_paid.
+    """
     
     BOTTLE_CHOICES = [
         ('25CL', '25cl'),
@@ -88,7 +132,7 @@ class Sale(UserTrackingModel):
     # Managers
     objects = SaleManager()
     archived = ArchivedSaleManager()
-    all_objects = models.Manager()  # Access to everything
+    all_objects = models.Manager()  # Access to everything (active + deleted)
     
     class Meta:
         ordering = ['-sale_date', '-sale_time']
@@ -98,17 +142,34 @@ class Sale(UserTrackingModel):
     
     @property
     def amount_paid(self):
-        """Calculate total paid from payment history"""
+        """
+        Calculate the total amount paid so far.
+        
+        Returns:
+            Decimal: Sum of all related Payment records.
+        """
         total = self.payments.aggregate(Sum('amount'))['amount__sum']
         return total or 0
     
     @property
     def amount_due(self):
-        """Remaining balance"""
+        """
+        Calculate remaining balance.
+        
+        Returns:
+            Decimal: Total Price - Amount Paid.
+        """
         return self.total_price - self.amount_paid
     
     def update_payment_status(self):
-        """Auto-update payment status based on payments"""
+        """
+        Recalculate and update 'payment_status' based on current payments.
+        
+        Logic:
+            - If paid == 0 -> UNPAID
+            - If paid >= total -> PAID
+            - Else -> PARTIAL
+        """
         paid = self.amount_paid
         if paid == 0:
             self.payment_status = 'UNPAID'
@@ -119,7 +180,13 @@ class Sale(UserTrackingModel):
         self.save()
     
     def soft_delete(self, user, reason):
-        """Perform soft delete"""
+        """
+        Mark sale as deleted without removing from database.
+        
+        Args:
+            user (User): The admin performing the deletion.
+            reason (str): Justification for deletion.
+        """
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.deleted_by = user
@@ -127,7 +194,7 @@ class Sale(UserTrackingModel):
         self.save()
 
     def restore(self):
-        """Restore deleted sale"""
+        """Undo soft-delete and restore to active state."""
         self.is_deleted = False
         self.deleted_at = None
         self.deleted_by = None
@@ -135,6 +202,13 @@ class Sale(UserTrackingModel):
         self.save()
     
     def save(self, *args, **kwargs):
+        """
+        Save the sale with business logic hooks.
+        
+        Hooks:
+            1. Auto-calculates total_price (unit_price * quantity).
+            2. Auto-creates Customer if 'customer_name' is provided but 'customer' FK is null.
+        """
         # Auto-calculate total_price
         if self.unit_price and self.quantity:
             self.total_price = self.unit_price * self.quantity
@@ -149,8 +223,6 @@ class Sale(UserTrackingModel):
             # The UserTrackingMiddleware handles setting self.modified_by on save
             # But here we are BEFORE save, so we need to be careful
             
-            # Since get_current_user exists in middleware
-            # We can use it here as well for the customer creation
             from apps.core.middleware import get_current_user
             current_user = get_current_user()
             
@@ -169,7 +241,19 @@ class Sale(UserTrackingModel):
 
 
 class Payment(models.Model):
-    """Payment transaction history for sales"""
+    """
+    Record of a payment made against a Sale.
+    
+    Attributes:
+        sale (Sale): The parent transaction.
+        amount (Decimal): The amount paid.
+        payment_method (str): CASH, TRANSFER, POS, etc.
+        payment_date (DateTimeField): When it happened.
+        created_by (User): Who recorded it.
+    
+    Signals:
+        Triggers 'update_sale_payment_status' on save/delete.
+    """
     
     PAYMENT_METHOD_CHOICES = [
         ('CASH', 'Cash'),
@@ -203,7 +287,7 @@ class Payment(models.Model):
         return f"₦{self.amount} for Sale #{self.sale.id}"
     
     def save(self, *args, **kwargs):
-        # Auto-assign created_by if not set
+        """Auto-assign currently logged-in user to 'created_by'."""
         if not self.pk and not hasattr(self, 'created_by'):
              from apps.core.middleware import get_current_user
              user = get_current_user()

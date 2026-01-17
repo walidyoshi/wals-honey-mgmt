@@ -1,5 +1,11 @@
 """
-Forms for expense management
+Expenses Forms
+
+This module handles validation for expense data entry.
+
+Forms:
+- ExpenseForm: Manages expense creation/editing with strict date validation.
+- ArchiveExpenseForm: Captures reason for deletion.
 """
 
 from django import forms
@@ -8,7 +14,13 @@ from .models import Expense
 
 
 class ExpenseForm(forms.ModelForm):
-    """Form for adding/updating expenses"""
+    """
+    Form for recording an expense.
+    
+    Features:
+        - Strict Date Parsing: Enforces 'dd/mm/yyyy' format (or 'yyyy-mm-dd' fallback).
+        - Numeric Input: 'cost' field uses numeric inputmode for mobile users.
+    """
     
     # Override expense_date to use CharField to avoid Django's date widget validation
     expense_date = forms.CharField(
@@ -29,7 +41,15 @@ class ExpenseForm(forms.ModelForm):
         }
     
     def clean_expense_date(self):
-        """Parse dd/mm/yyyy format to date object"""
+        """
+        Validate date input.
+        
+        Returns:
+            date: Parsed python date object.
+            
+        Raises:
+            ValidationError: If format is strictly invalid.
+        """
         expense_date = self.data.get('expense_date', '')
         
         if not expense_date:
@@ -46,9 +66,10 @@ class ExpenseForm(forms.ModelForm):
                 raise forms.ValidationError('Please enter a valid date in dd/mm/yyyy format')
 
 
-
 class ArchiveExpenseForm(forms.Form):
-    """Form for soft deleting/archiving an expense"""
+    """
+    Form to prompt for a reason when archiving an expense.
+    """
     reason = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Reason for deletion required'}),
         required=True

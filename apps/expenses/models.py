@@ -1,5 +1,15 @@
 """
-Expense model
+Expenses Models
+
+This module handles operational expense tracking.
+
+Business Logic:
+- Expenses are separate from inventory costs (Cost of Goods Sold).
+- Uses simple 'soft delete' to allow restoring accidental deletions.
+- Expenses are categorized by 'item' (currently free text, potentially categorical in future).
+
+Models:
+- Expense: Represents a single financial outflow.
 """
 
 from django.db import models
@@ -8,19 +18,36 @@ from apps.core.models import UserTrackingModel
 
 
 class ExpenseManager(models.Manager):
-    """Custom manager to exclude deleted expenses by default"""
+    """
+    Default manager that filters out soft-deleted expenses.
+    """
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=False)
 
 
 class ArchivedExpenseManager(models.Manager):
-    """Manager to find deleted expenses"""
+    """
+    Manager to retrieve only soft-deleted expenses for restoration/audit.
+    """
     def get_queryset(self):
         return super().get_queryset().filter(is_deleted=True)
 
 
 class Expense(UserTrackingModel):
-    """Business expense tracking with soft delete support"""
+    """
+    Represents an operational expense (e.g., Rent, Packaging, Transport).
+    
+    Attributes:
+        item (CharField): Description of the expense.
+        cost (DecimalField): Monetary value.
+        expense_date (DateField): Date incurred.
+        notes (TextField): Additional details.
+        
+        is_deleted (bool): Soft-delete flag.
+        deleted_at (DateTimeField): When it was deleted.
+        deleted_reason (TextField): Justification.
+        deleted_by (User): Who deleted it.
+    """
     item = models.CharField(max_length=200)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     expense_date = models.DateField()
@@ -50,7 +77,13 @@ class Expense(UserTrackingModel):
         return f"{self.item} - ₦{self.cost}"
         
     def soft_delete(self, user, reason):
-        """Perform soft delete"""
+        """
+        Mark expense as deleted.
+        
+        Args:
+            user (User): Admin performing the action.
+            reason (str): Why it is being deleted.
+        """
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.deleted_by = user
@@ -58,7 +91,7 @@ class Expense(UserTrackingModel):
         self.save()
 
     def restore(self):
-        """Restore deleted expense"""
+        """Restore a soft-deleted expense."""
         self.is_deleted = False
         self.deleted_at = None
         self.deleted_by = None

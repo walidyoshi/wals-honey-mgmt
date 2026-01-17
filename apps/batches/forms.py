@@ -1,5 +1,10 @@
 """
-Forms for batch management
+Batches Forms
+
+This module handles form processing for Batch management.
+
+Forms:
+- BatchForm: Handles creation and editing of batches with custom validation.
 """
 
 from django import forms
@@ -8,7 +13,15 @@ from .models import Batch
 
 
 class BatchForm(forms.ModelForm):
-    """Form for creating and updating batches"""
+    """
+    Form for creating and updating Batch records.
+    
+    Custom Behaviors:
+        - supply_date: Manually rendered as text input to support custom date formats
+          and avoid browser-specific date pickers that might conflict with user preference.
+        - clean_supply_date: Logic to parse multiple date formats (dd/mm/yyyy first).
+        - inputmode: Adds HTML attributes for numeric keypads on mobile devices.
+    """
     
     # Override supply_date to use CharField to avoid Django's date widget validation
     supply_date = forms.CharField(
@@ -38,7 +51,19 @@ class BatchForm(forms.ModelForm):
         }
     
     def clean_supply_date(self):
-        """Parse dd/mm/yyyy format to date object"""
+        """
+        Validate and parse the supply date.
+        
+        Logic:
+            - Attempt to parse as dd/mm/yyyy (primary format).
+            - Fallback to YYYY-MM-DD.
+        
+        Returns:
+            date: Python date object if valid.
+            
+        Raises:
+            ValidationError: If date format is invalid.
+        """
         supply_date = self.data.get('supply_date', '')
         
         if not supply_date:
@@ -55,6 +80,12 @@ class BatchForm(forms.ModelForm):
                 raise forms.ValidationError('Please enter a valid date in dd/mm/yyyy format')
     
     def clean(self):
+        """
+        Perform cross-field validation.
+        
+        Current Logic:
+            - Checks for group price consistency (currently non-blocking warning logic).
+        """
         cleaned_data = super().clean()
         price = cleaned_data.get('price')
         batch_id = cleaned_data.get('batch_id')
