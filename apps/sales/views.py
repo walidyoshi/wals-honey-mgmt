@@ -171,6 +171,12 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         kwargs['sale'] = self.sale
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        """Pass sale object to template for form display."""
+        context = super().get_context_data(**kwargs)
+        context['sale'] = self.sale
+        return context
         
     def form_valid(self, form):
         payment = form.save(commit=False)
