@@ -57,6 +57,9 @@ class Batch(UserTrackingModel):
     price = models.DecimalField(
         max_digits=10, 
         decimal_places=2,
+        null=True,
+        blank=True,
+        default=0,
         help_text="Purchase price for this jerrycan"
     )
     tp_cost = models.DecimalField(
@@ -118,7 +121,7 @@ class Batch(UserTrackingModel):
         Returns:
             Decimal: Sum of price and tp_cost (transport cost).
         """
-        return self.price + (self.tp_cost or 0)
+        return (self.price or 0) + (self.tp_cost or 0)
 
 
 class AuditLog(models.Model):

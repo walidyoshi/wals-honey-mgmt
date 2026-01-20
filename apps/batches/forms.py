@@ -50,6 +50,47 @@ class BatchForm(forms.ModelForm):
             'bottles_4L': forms.NumberInput(attrs={'inputmode': 'numeric'}),
         }
     
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize form and set optional fields.
+        
+        Only batch_id is required. All other fields are optional.
+        """
+        super().__init__(*args, **kwargs)
+        
+        # Make these fields optional (only batch_id is required)
+        optional_fields = [
+            'price', 'tp_cost', 'source', 'notes',
+            'bottles_25cl', 'bottles_75cl', 'bottles_1L', 'bottles_4L'
+        ]
+        for field in optional_fields:
+            if field in self.fields:
+                self.fields[field].required = False
+    
+    def clean_bottles_25cl(self):
+        """Convert empty bottle count to 0."""
+        return self.cleaned_data.get('bottles_25cl') or 0
+    
+    def clean_bottles_75cl(self):
+        """Convert empty bottle count to 0."""
+        return self.cleaned_data.get('bottles_75cl') or 0
+    
+    def clean_bottles_1L(self):
+        """Convert empty bottle count to 0."""
+        return self.cleaned_data.get('bottles_1L') or 0
+    
+    def clean_bottles_4L(self):
+        """Convert empty bottle count to 0."""
+        return self.cleaned_data.get('bottles_4L') or 0
+    
+    def clean_price(self):
+        """Convert empty price to 0."""
+        return self.cleaned_data.get('price') or 0
+    
+    def clean_tp_cost(self):
+        """Convert empty transport cost to None (allowed by model)."""
+        return self.cleaned_data.get('tp_cost') or None
+    
     def clean_supply_date(self):
         """
         Validate and parse the supply date.
