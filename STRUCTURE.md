@@ -9,10 +9,12 @@ This document outlines the file structure of the **Wals Honey Management System*
 ├── apps
 │   ├── accounts          # Authentication & User Management
 │   ├── batches           # Inventory & Honey Batch Tracking
+│   │   └── tests/        # Unit tests (72 tests)
 │   ├── core              # Shared Utilities & Middleware
 │   ├── customers         # Customer Data
 │   ├── expenses          # Business Expense Tracking
 │   └── sales             # Transactions & Payment Logic
+│       └── tests/        # Unit tests (25 tests)
 ├── config
 │   ├── settings          # Environment-specific settings
 │   │   ├── base.py

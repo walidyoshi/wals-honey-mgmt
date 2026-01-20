@@ -47,6 +47,23 @@ For more detailed information, please refer to the documentation:
 - [Business Logic & Workflows](docs/business_logic.md)
 - [Deployment Guide](docs/deployment.md)
 
+## Testing
+The project includes comprehensive unit tests:
+
+```bash
+# Run all tests
+python manage.py test
+
+# Run specific module tests
+python manage.py test apps.batches.tests    # 72 tests
+python manage.py test apps.sales.tests      # 25 tests
+```
+
+| Module | Tests | Coverage |
+|--------|-------|----------|
+| Batches | 72 | Models, Forms, Views, Edge Cases |
+| Payments | 25 | Form validation, Views, Status updates |
+
 ## Tech Stack
 - **Backend**: Django (Python)
 - **Database**: PostgreSQL (Production) / SQLite (Development)

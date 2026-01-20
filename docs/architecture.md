@@ -45,15 +45,26 @@ The Wals Honey Management System is a modular Django application designed with *
 #### 4. Batches (`apps/batches/`)
 **Purpose**: The core inventory tracking module.
 -   **Models**: `Batch` represents a collection of honey (e.g., specific jerrycans from a supplier).
--   **Logic**: Tracks batch cost, source, and current status.
+-   **Properties**: 
+    -   `total_cost`: Calculated as price + transport cost.
+    -   `total_bottles`: Sum of all bottle sizes (25cl, 75cl, 1L, 4L).
+    -   `group_number`: Extracts group identifier from batch_id.
+-   **Forms**: Flexible creation - only `batch_id` is required; all other fields optional.
+-   **Views**: Responsive list (table on desktop, cards on mobile), ordered by newest entry first.
 -   **Audit**: `AuditLog` tracks all modifications to batch records.
+-   **Tests**: 72 unit tests covering models, forms, views, and edge cases.
 
 #### 5. Sales (`apps/sales/`)
 **Purpose**: Manages transactions and payments.
 -   **Models**:
     -   `Sale`: The header record for a transaction (Customer, Date, Total Amount).
     -   `Payment`: Tracks partial or full payments against a sale.
--   **Signals**: Automatically updates `Sale` payment status (UNPAID, PARTIAL, PAID) when a `Payment` is recorded or deleted.
+-   **Features**:
+    -   HTMX-powered payment modal with confirmation dialog.
+    -   Automatic payment status updates (UNPAID → PARTIAL → PAID).
+    -   Payment validation prevents overpayment.
+-   **Signals**: Automatically updates `Sale` payment status when a `Payment` is recorded or deleted.
+-   **Tests**: 25 unit tests for payment functionality.
 
 #### 6. Expenses (`apps/expenses/`)
 **Purpose**: Tracks operational costs unrelated to direct honey purchase (e.g., transport, packaging).

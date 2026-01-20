@@ -25,8 +25,16 @@ We track specific jerrycans/batches because:
 ### Workflow: Batch Creation
 1.  Honey arrives from a supplier.
 2.  It is weighed and assigned a Batch ID.
-3.  Details (Weight, Cost, Supplier) are entered into the system.
-4.  Status is set to 'Active' (Available for sale).
+3.  User enters the Batch ID (minimum required field).
+4.  Optional details can be added: price, transport cost, supply date, source, bottle counts.
+5.  Batch is created with defaults (price=0, bottles=0) for any empty fields.
+6.  Details can be updated later as information becomes available.
+
+### Batch List Display
+-   **Desktop/Tablet**: Table view with columns for ID, Date, Source, Cost, Transport, Total, and bottle counts (25cl, 75cl, 1L, 4L).
+-   **Mobile**: Card view with key information.
+-   **Ordering**: Newest batches first (by entry date).
+-   **Clickable Rows**: Click any row to view batch details.
 
 ---
 
@@ -76,7 +84,16 @@ This separation allows for accurate Gross Object vs. Net Profit calculation.
 The system prevents common data entry errors:
 -   **Duplicate Batches**: You cannot create two active batches with the exact same ID.
 -   **Negative Values**: Sales amounts and weights cannot be negative.
--   **Dates**: Simple valid dates required (dd/mm/yyyy).
+-   **Dates**: Simple valid dates required (dd/mm/yyyy or YYYY-MM-DD).
+-   **Payment Limits**: Cannot pay more than the outstanding balance on a sale.
+-   **Empty Fields**: Empty numeric fields default to 0 (bottles, price) or None (transport cost).
+
+---
+
+## 6. Testing
+The system includes comprehensive unit tests:
+-   **Batch Module**: 72 tests covering models, forms, views, and edge cases.
+-   **Payment Module**: 25 tests covering form validation, view behavior, and status updates.
 
 ## Real-World Scenario: A Complete Cycle
 1.  **Acquisition**: Walid buys 5 jerrycans from Supplier "Mountain". He enters them as Batch **M24G05**, Total Weight 120kg, Cost $500.
