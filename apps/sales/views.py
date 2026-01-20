@@ -154,10 +154,20 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
     """
     HTMX-compatible view to add a payment.
     
-    Behavior:
-        - Validates PaymentForm.
-        - On success, returns a partial HTML update (payment_list.html)
-          re-rendering the payment history table without a full page reload.
+    URL Pattern: /sales/<pk>/payments/add/
+    Template: sales/partials/payment_form.html (modal dialog)
+    
+    Features:
+        - Validates PaymentForm (ensures payment doesn't exceed balance due).
+        - Passes 'sale' context to template for display of sale details.
+        - On success, returns payment_list.html partial for HTMX swap.
+        - Frontend confirmation dialog before submission.
+    
+    Methods:
+        setup: Loads the parent Sale instance from URL.
+        get_form_kwargs: Passes sale to form for validation.
+        get_context_data: Adds sale to template context.
+        form_valid: Saves payment and returns updated payment list.
     """
     model = Payment
     form_class = PaymentForm

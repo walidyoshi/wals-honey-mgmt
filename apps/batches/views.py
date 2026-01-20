@@ -40,7 +40,7 @@ class BatchListView(LoginRequiredMixin, ListView):
         Returns:
             QuerySet: Filtered Batches.
         """
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().order_by('-created_at')
         
         # Filtering
         search = self.request.GET.get('search')

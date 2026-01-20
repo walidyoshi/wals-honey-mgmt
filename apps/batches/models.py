@@ -42,6 +42,7 @@ class Batch(UserTrackingModel):
     Properties:
         group_number: Extracts the group identifier (e.g., 'G02') from the batch_id.
         total_bottles: Sum of all bottle sizes produced from this batch.
+        total_cost: Sum of price and transport cost.
     
     Example:
         >>> batch = Batch.objects.create(batch_id="A24G02", price=500.00)
@@ -108,6 +109,16 @@ class Batch(UserTrackingModel):
         """
         return (self.bottles_25cl + self.bottles_75cl + 
                 self.bottles_1L + self.bottles_4L)
+    
+    @property
+    def total_cost(self):
+        """
+        Calculate total batch cost (purchase price + transport).
+        
+        Returns:
+            Decimal: Sum of price and tp_cost (transport cost).
+        """
+        return self.price + (self.tp_cost or 0)
 
 
 class AuditLog(models.Model):

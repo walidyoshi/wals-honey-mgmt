@@ -36,13 +36,56 @@
     </form>
 </div>
 
-<!-- Batch List -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+{% load humanize %}
+
+<!-- Table View for Tablet/PC (hidden on mobile) -->
+<div class="hidden md:block bg-white rounded-lg shadow border border-gray-100 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
+                <th scope="col" class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Cost</th>
+                <th scope="col" class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">TP</th>
+                <th scope="col" class="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase">25cl</th>
+                <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase">75cl</th>
+                <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase">1L</th>
+                <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase">4L</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for batch in batches %}
+            <tr class="hover:bg-indigo-50 cursor-pointer transition-colors" onclick="window.location='{% url 'batches:detail' batch.pk %}'">
+                <td class="px-3 py-3 whitespace-nowrap font-bold text-indigo-600">{{ batch.batch_id }}</td>
+                <td class="px-3 py-3 whitespace-nowrap text-gray-500">{{ batch.created_at|date:"M d, Y" }}</td>
+                <td class="px-3 py-3 whitespace-nowrap text-gray-900">{{ batch.source|default:"-"|truncatechars:15 }}</td>
+                <td class="px-3 py-3 whitespace-nowrap text-gray-900 text-right">₦{{ batch.price|floatformat:0|intcomma }}</td>
+                <td class="px-3 py-3 whitespace-nowrap text-gray-500 text-right">₦{{ batch.tp_cost|floatformat:0|intcomma|default:"0" }}</td>
+                <td class="px-3 py-3 whitespace-nowrap font-bold text-gray-900 text-right">₦{{ batch.total_cost|floatformat:0|intcomma }}</td>
+                <td class="px-2 py-3 whitespace-nowrap text-center text-gray-700">{{ batch.bottles_25cl }}</td>
+                <td class="px-2 py-3 whitespace-nowrap text-center text-gray-700">{{ batch.bottles_75cl }}</td>
+                <td class="px-2 py-3 whitespace-nowrap text-center text-gray-700">{{ batch.bottles_1L }}</td>
+                <td class="px-2 py-3 whitespace-nowrap text-center text-gray-700">{{ batch.bottles_4L }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" class="px-6 py-12 text-center text-gray-500">
+                    No batches found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Card View for Mobile (hidden on tablet/PC) -->
+<div class="md:hidden space-y-4">
     {% for batch in batches %}
-    <div
-        class="bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-100 flex flex-col h-full">
-        <div class="p-5 flex-1">
-            <div class="flex justify-between items-start mb-4">
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200 border border-gray-100">
+        <div class="p-4">
+            <div class="flex justify-between items-start mb-3">
                 <div>
                     <h3 class="text-lg font-bold text-indigo-600">
                         <a href="{% url 'batches:detail' batch.pk %}" class="hover:underline">{{ batch.batch_id }}</a>
@@ -61,12 +104,20 @@
                 </div>
                 <div class="flex justify-between">
                     <span>Cost:</span>
-                    <span class="font-medium text-gray-900">₦{{ batch.price }}</span>
+                    <span class="font-medium text-gray-900">₦{{ batch.price|floatformat:0|intcomma }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Transport:</span>
+                    <span class="font-medium text-gray-500">₦{{ batch.tp_cost|floatformat:0|intcomma|default:"0" }}</span>
+                </div>
+                <div class="flex justify-between border-t pt-2">
+                    <span class="font-medium">Total:</span>
+                    <span class="font-bold text-gray-900">₦{{ batch.total_cost|floatformat:0|intcomma }}</span>
                 </div>
             </div>
 
             <!-- Bottle Breakdown -->
-            <div class="mt-4 grid grid-cols-4 gap-2 text-center text-xs">
+            <div class="mt-3 grid grid-cols-4 gap-2 text-center text-xs">
                 <div class="bg-gray-50 p-1 rounded">
                     <div class="font-bold text-gray-700">{{ batch.bottles_25cl }}</div>
                     <div class="text-gray-400 text-[10px]">25cl</div>
@@ -86,7 +137,7 @@
             </div>
         </div>
 
-        <div class="bg-gray-50 px-5 py-3 border-t border-gray-100 flex justify-between items-center text-sm">
+        <div class="bg-gray-50 px-4 py-2 border-t border-gray-100 flex justify-between items-center text-sm">
             {% if batch.group_number %}
             <a href="{% url 'batches:group_summary' batch.group_number %}"
                 class="text-indigo-600 hover:text-indigo-900 text-xs font-medium">
@@ -95,11 +146,11 @@
             {% else %}
             <span></span>
             {% endif %}
-            <a href="{% url 'batches:detail' batch.pk %}" class="text-gray-500 hover:text-gray-700">Details &rarr;</a>
+            <a href="{% url 'batches:detail' batch.pk %}" class="text-gray-500 hover:text-gray-700">Details →</a>
         </div>
     </div>
     {% empty %}
-    <div class="col-span-full text-center py-12 text-gray-500 bg-white rounded-lg border border-dashed border-gray-300">
+    <div class="text-center py-12 text-gray-500 bg-white rounded-lg border border-dashed border-gray-300">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
