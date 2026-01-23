@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}Expenses{% endblock %}
 
@@ -73,7 +74,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for expense in expenses %}
-                <tr class="hover:bg-gray-50">
+                <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{% url 'expenses:detail' expense.pk %}'">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ expense.expense_date|date:"M d, Y" }}
                     </td>
@@ -87,7 +88,7 @@
                         {{ expense.created_by.full_name|default:expense.created_by.email }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-right">
-                        ₦{{ expense.cost }}
+                        ₦{{ expense.cost|intcomma }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <a href="{% url 'expenses:detail' expense.pk %}"
@@ -108,13 +109,13 @@
     <!-- Mobile Cards -->
     <div class="md:hidden divide-y divide-gray-200">
         {% for expense in expenses %}
-        <div class="p-4 space-y-2">
+        <div class="p-4 space-y-2 cursor-pointer" onclick="window.location='{% url 'expenses:detail' expense.pk %}'">
             <div class="flex justify-between items-start">
                 <div>
                     <div class="font-medium text-gray-900">{{ expense.item }}</div>
                     <div class="text-xs text-gray-500">{{ expense.expense_date|date:"M d, Y" }}</div>
                 </div>
-                <div class="font-bold text-gray-900">₦{{ expense.cost }}</div>
+                <div class="font-bold text-gray-900">₦{{ expense.cost|intcomma }}</div>
             </div>
             {% if expense.notes %}
             <p class="text-xs text-gray-600 bg-gray-50 p-2 rounded">{{ expense.notes }}</p>

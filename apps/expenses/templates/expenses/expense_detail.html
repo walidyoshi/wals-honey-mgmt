@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load audit_tags %}
+{% load audit_tags humanize %}
 
 {% block title %}Expense Details{% endblock %}
 
@@ -50,7 +50,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-500">Amount</label>
-                <div class="mt-1 text-lg font-bold text-gray-900">₦{{ expense.cost }}</div>
+                <div class="mt-1 text-lg font-bold text-gray-900">₦{{ expense.cost|intcomma }}</div>
             </div>
             <div class="col-span-1 sm:col-span-2">
                 <label class="block text-sm font-medium text-gray-500">Item / Description</label>
