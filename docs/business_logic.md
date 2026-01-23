@@ -75,6 +75,7 @@ This separation allows for accurate Gross Object vs. Net Profit calculation.
     -   Modifications to Batch details (e.g., changing weight).
     -   Deletion of Payments.
     -   Edits to crucial Sale info.
+    -   Changes to Expense records (item, cost, date, notes).
 -   **Visibility**: Admins can view the "Change History" tab on any record to see *who* changed *what* and *when*.
 -   **Value**: Prevents theft and accidental data loss.
 
