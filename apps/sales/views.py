@@ -65,6 +65,12 @@ class SaleCreateView(LoginRequiredMixin, CreateView):
     template_name = 'sales/sale_form.html'
     success_url = reverse_lazy('sales:list')
 
+    def form_valid(self, form):
+        """Save sale and add success message."""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Sale #{self.object.pk} created successfully.")
+        return response
+
 
 class SaleDetailView(LoginRequiredMixin, DetailView):
     """
@@ -89,6 +95,12 @@ class SaleUpdateView(LoginRequiredMixin, UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('sales:detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        """Save sale and add success message."""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Sale #{self.object.pk} updated successfully.")
+        return response
 
 
 class SaleArchiveView(LoginRequiredMixin, FormView):

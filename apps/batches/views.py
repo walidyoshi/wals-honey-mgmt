@@ -10,6 +10,7 @@ Views:
 """
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Sum, F
@@ -66,6 +67,12 @@ class BatchCreateView(LoginRequiredMixin, CreateView):
     template_name = 'batches/batch_form.html'
     success_url = reverse_lazy('batches:list')
 
+    def form_valid(self, form):
+        """Save batch and add success message."""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Batch {self.object.batch_id} created successfully.")
+        return response
+
 
 class BatchDetailView(LoginRequiredMixin, DetailView):
     """
@@ -92,6 +99,12 @@ class BatchUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         """Redirect to detail page after update."""
         return reverse_lazy('batches:detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        """Save batch and add success message."""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Batch {self.object.batch_id} updated successfully.")
+        return response
 
 
 class BatchDeleteView(LoginRequiredMixin, DeleteView):

@@ -73,6 +73,12 @@ class ExpenseCreateView(LoginRequiredMixin, CreateView):
     template_name = 'expenses/expense_form.html'
     success_url = reverse_lazy('expenses:list')
 
+    def form_valid(self, form):
+        """Save expense and add success message."""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Expense '{self.object.item}' created successfully.")
+        return response
+
 
 class ExpenseDetailView(LoginRequiredMixin, DetailView):
     """
@@ -96,6 +102,12 @@ class ExpenseUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ExpenseForm
     template_name = 'expenses/expense_form.html'
     success_url = reverse_lazy('expenses:list')
+
+    def form_valid(self, form):
+        """Save expense and add success message."""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Expense '{self.object.item}' updated successfully.")
+        return response
 
 
 class ExpenseArchiveView(LoginRequiredMixin, FormView):
