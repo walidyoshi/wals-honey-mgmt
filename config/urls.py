@@ -13,4 +13,5 @@ urlpatterns = [
     path('batches/', include('apps.batches.urls')),
     path('expenses/', include('apps.expenses.urls')),
     path('customers/', include('apps.customers.urls')),
+    path('statistics/', include('apps.reports.urls')),
 ]

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'apps.batches',   # Inventory
     'apps.sales',     # POS/Transactions
     'apps.expenses',  # Financials
+    'apps.reports',   # Statistics/Reports
 ]
 
 MIDDLEWARE = [
