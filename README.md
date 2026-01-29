@@ -71,7 +71,7 @@ python manage.py test apps.sales.tests      # 25 tests
 - **Deployment**: Render.com, Supabase(Might go with a different option at deployment stage)
 
 ## Team
-Developed by the Walid Mahmud.
+Developed by Walid Mahmud.
 
 ## License
 Proprietary software. All rights reserved.
