@@ -29,8 +29,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <!-- Custom CSS & JS -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=4">
     <script src="{% static 'js/main.js' %}?v=2" defer></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans antialiased" x-data="{ sidebarOpen: false }">
@@ -89,8 +92,8 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
-        <div class="p-4 md:p-8 max-w-7xl mx-auto">
+    <main id="main-content" class="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
+        <div class="p-4 md:p-8 max-w-7xl mx-auto main-content-wrapper">
             <!-- Messages -->
             {% if messages %}
                 <div class="mb-4 space-y-2">
@@ -107,6 +110,20 @@
             {% endblock %}
         </div>
     </main>
+
+    <!-- Mobile Bottom Navigation -->
+    {% include 'partials/bottom_nav.html' %}
+    
+    <!-- Initialize Lucide Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+        // Re-initialize icons after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', function() {
+            lucide.createIcons();
+        });
+    </script>
 
 </body>
 </html>

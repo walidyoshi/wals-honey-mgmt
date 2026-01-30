@@ -2,9 +2,11 @@
 .htmx-indicator {
     display: none;
 }
+
 .htmx-request .htmx-indicator {
     display: inline;
 }
+
 .htmx-request.htmx-indicator {
     display: inline;
 }
@@ -13,6 +15,7 @@
 .sidebar-scroll::-webkit-scrollbar {
     width: 4px;
 }
+
 .sidebar-scroll::-webkit-scrollbar-thumb {
     background-color: #e2e8f0;
     border-radius: 4px;
@@ -35,11 +38,195 @@ input[type=number] {
     .no-print {
         display: none !important;
     }
+
     .print-only {
         display: block !important;
     }
+
     body {
         margin: 0;
         padding: 0;
+    }
+}
+
+/* ========================================
+   Bottom Navigation Bar
+   ======================================== */
+
+:root {
+    --bottom-nav-height: 80px;
+    --bottom-nav-bg: rgba(255, 255, 255, 0.85);
+    --bottom-nav-blur: 16px;
+    --capsule-bg: rgba(255, 255, 255, 0.95);
+    --capsule-active-bg: rgba(79, 70, 229, 0.1);
+    --capsule-add-bg: rgba(0, 0, 0, 0.05);
+    --capsule-add-hover: rgba(0, 0, 0, 0.1);
+    --capsule-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --capsule-border: rgba(0, 0, 0, 0.06);
+}
+
+/* Main navigation container */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--bottom-nav-bg);
+    backdrop-filter: blur(var(--bottom-nav-blur));
+    -webkit-backdrop-filter: blur(var(--bottom-nav-blur));
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 12px 8px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Inner container */
+.bottom-nav-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* Capsule base */
+.bottom-nav-capsule {
+    display: flex;
+    flex: 1;
+    max-width: 110px;
+    background: var(--capsule-bg);
+    border-radius: 9999px;
+    box-shadow: var(--capsule-shadow);
+    border: 1px solid var(--capsule-border);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.bottom-nav-capsule:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+/* Active state */
+.bottom-nav-capsule.active {
+    background: var(--capsule-active-bg);
+    border-color: rgba(79, 70, 229, 0.2);
+}
+
+.bottom-nav-capsule.active .capsule-main {
+    color: #4f46e5;
+}
+
+.bottom-nav-capsule.active .capsule-icon {
+    color: #4f46e5;
+}
+
+/* Main section (70%) */
+.capsule-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 70%;
+    padding: 8px 4px;
+    text-decoration: none;
+    color: #374151;
+    transition: all 0.15s ease;
+}
+
+.capsule-main:hover {
+    color: #4f46e5;
+}
+
+/* Full width for Stats */
+.capsule-full {
+    flex: 1 1 100%;
+    border-radius: 9999px;
+}
+
+/* Add button section (30%) */
+.capsule-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 30%;
+    background: var(--capsule-add-bg);
+    text-decoration: none;
+    color: #6b7280;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.15s ease;
+}
+
+.capsule-add:hover {
+    background: var(--capsule-add-hover);
+    color: #4f46e5;
+}
+
+.capsule-add:active {
+    background: rgba(79, 70, 229, 0.15);
+}
+
+/* Stats-only capsule (no add button) */
+.stats-only {
+    max-width: 85px;
+}
+
+/* Icons */
+.capsule-icon {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.75;
+    color: #6b7280;
+    transition: color 0.15s ease;
+}
+
+.capsule-main:hover .capsule-icon {
+    color: #4f46e5;
+}
+
+.add-icon {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5;
+}
+
+/* Labels */
+.capsule-label {
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+/* Mobile content padding to account for bottom nav */
+@media (max-width: 1023px) {
+    main {
+        padding-bottom: calc(var(--bottom-nav-height) + 16px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
+
+/* Hide bottom nav on desktop (handled by lg:hidden but CSS fallback) */
+@media (min-width: 1024px) {
+    .bottom-nav {
+        display: none !important;
+    }
+}
+
+/* HTMX loading indicator */
+.bottom-nav .htmx-request .capsule-icon {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
     }
 }
