@@ -54,15 +54,15 @@ input[type=number] {
    ======================================== */
 
 :root {
-    --bottom-nav-height: 80px;
-    --bottom-nav-bg: rgba(255, 255, 255, 0.85);
-    --bottom-nav-blur: 16px;
-    --capsule-bg: rgba(255, 255, 255, 0.95);
-    --capsule-active-bg: rgba(79, 70, 229, 0.1);
-    --capsule-add-bg: rgba(0, 0, 0, 0.05);
-    --capsule-add-hover: rgba(0, 0, 0, 0.1);
-    --capsule-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --capsule-border: rgba(0, 0, 0, 0.06);
+    --bottom-nav-height: 85px;
+    --nav-bg: rgba(255, 255, 255, 0.95);
+    --nav-item-bg: #f3f4f6;
+    --nav-item-active-bg: rgba(79, 70, 229, 0.1);
+    --nav-add-bg: #e5e7eb;
+    --nav-text: #6b7280;
+    --nav-text-active: #4f46e5;
+    --nav-icon-active: #4f46e5;
+    --nav-border: rgba(0, 0, 0, 0.06);
 }
 
 /* Main navigation container */
@@ -72,21 +72,18 @@ input[type=number] {
     left: 0;
     right: 0;
     z-index: 50;
-    background: var(--bottom-nav-bg);
-    backdrop-filter: blur(var(--bottom-nav-blur));
-    -webkit-backdrop-filter: blur(var(--bottom-nav-blur));
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 12px 8px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--nav-bg);
+    padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Inner container */
 .bottom-nav-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 8px;
-    max-width: 480px;
+    align-items: stretch;
+    gap: 10px;
+    max-width: 420px;
     margin: 0 auto;
 }
 
@@ -94,109 +91,114 @@ input[type=number] {
 .bottom-nav-capsule {
     display: flex;
     flex: 1;
-    max-width: 110px;
-    background: var(--capsule-bg);
-    border-radius: 9999px;
-    box-shadow: var(--capsule-shadow);
-    border: 1px solid var(--capsule-border);
+    min-width: 0;
+    background: var(--nav-item-bg);
+    border-radius: 12px;
     overflow: hidden;
     transition: all 0.2s ease;
 }
 
-.bottom-nav-capsule:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transform: translateY(-1px);
-}
-
 /* Active state */
 .bottom-nav-capsule.active {
-    background: var(--capsule-active-bg);
-    border-color: rgba(79, 70, 229, 0.2);
+    background: var(--nav-item-active-bg);
 }
 
 .bottom-nav-capsule.active .capsule-main {
-    color: #4f46e5;
+    color: var(--nav-text-active);
 }
 
 .bottom-nav-capsule.active .capsule-icon {
-    color: #4f46e5;
+    color: var(--nav-icon-active);
 }
 
-/* Main section (70%) */
+/* Main section (list view) */
 .capsule-main {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex: 0 0 70%;
-    padding: 8px 4px;
+    flex: 1;
+    padding: 10px 8px;
     text-decoration: none;
-    color: #374151;
+    color: var(--nav-text);
     transition: all 0.15s ease;
+    gap: 4px;
 }
 
 .capsule-main:hover {
-    color: #4f46e5;
+    color: #374151;
 }
 
-/* Full width for Stats */
+.capsule-main:hover .capsule-icon {
+    color: #374151;
+}
+
+/* Full width for Stats (no add button) */
 .capsule-full {
     flex: 1 1 100%;
-    border-radius: 9999px;
 }
 
-/* Add button section (30%) */
+/* Add button section - container */
 .capsule-add {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 30%;
-    background: var(--capsule-add-bg);
+    flex-shrink: 0;
+    width: 44px;
+    min-width: 44px;
+    padding: 6px;
+    background: transparent;
     text-decoration: none;
-    color: #6b7280;
-    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    border-left: 1px solid var(--nav-border);
+}
+
+/* Add button - the actual nested button */
+.capsule-add .add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--nav-add-bg);
+    border-radius: 8px;
+    color: var(--nav-text);
     transition: all 0.15s ease;
 }
 
-.capsule-add:hover {
-    background: var(--capsule-add-hover);
-    color: #4f46e5;
+.capsule-add:hover .add-btn {
+    background: #d1d5db;
+    color: var(--nav-text-active);
 }
 
-.capsule-add:active {
-    background: rgba(79, 70, 229, 0.15);
+.capsule-add:active .add-btn {
+    background: rgba(79, 70, 229, 0.2);
 }
 
 /* Stats-only capsule (no add button) */
 .stats-only {
-    max-width: 85px;
+    max-width: 70px;
 }
 
 /* Icons */
 .capsule-icon {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     stroke-width: 1.75;
-    color: #6b7280;
+    color: var(--nav-text);
     transition: color 0.15s ease;
-}
-
-.capsule-main:hover .capsule-icon {
-    color: #4f46e5;
 }
 
 .add-icon {
     width: 18px;
     height: 18px;
-    stroke-width: 2.5;
+    stroke-width: 2;
 }
 
 /* Labels */
 .capsule-label {
     font-size: 10px;
-    font-weight: 600;
-    margin-top: 2px;
-    letter-spacing: 0.02em;
+    font-weight: 500;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
 }
 
