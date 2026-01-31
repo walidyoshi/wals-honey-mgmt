@@ -95,7 +95,7 @@ input[type=number] {
     display: flex;
     flex: 1 1 0;
     min-width: 0;
-    max-width: 23%;
+    max-width: 20%;
     background: var(--nav-item-bg);
     border-radius: 12px;
     overflow: hidden;
@@ -187,9 +187,10 @@ input[type=number] {
 
 /* Stats-only capsule (no add button) */
 .stats-only {
-    max-width: 22%;
-    min-width: fit-content;
-    flex: 0 1 auto;
+    max-width: 30%;
+    min-width: 60px;
+    flex: 0 0 auto;
+    padding: 0 5%;
 }
 
 /* Icons */
