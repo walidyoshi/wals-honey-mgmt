@@ -13,7 +13,7 @@
 <nav class="bottom-nav lg:hidden" aria-label="Quick actions">
     <div class="bottom-nav-container">
         <!-- Sales Capsule -->
-        <div class="bottom-nav-capsule {% if request.resolver_match.app_name == 'sales' %}active{% endif %}">
+        <div class="bottom-nav-capsule {% if request.resolver_match.app_name == 'sales' %}active{% endif %}" data-nav-app="sales">
             <a href="{% url 'sales:list' %}" 
                hx-get="{% url 'sales:list' %}" 
                hx-target="#main-content" 
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Expenses Capsule -->
-        <div class="bottom-nav-capsule {% if request.resolver_match.app_name == 'expenses' %}active{% endif %}">
+        <div class="bottom-nav-capsule {% if request.resolver_match.app_name == 'expenses' %}active{% endif %}" data-nav-app="expenses">
             <a href="{% url 'expenses:list' %}" 
                hx-get="{% url 'expenses:list' %}" 
                hx-target="#main-content" 
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Batches Capsule -->
-        <div class="bottom-nav-capsule {% if request.resolver_match.app_name == 'batches' %}active{% endif %}">
+        <div class="bottom-nav-capsule {% if request.resolver_match.app_name == 'batches' %}active{% endif %}" data-nav-app="batches">
             <a href="{% url 'batches:list' %}" 
                hx-get="{% url 'batches:list' %}" 
                hx-target="#main-content" 
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Statistics Capsule (View Only) -->
-        <div class="bottom-nav-capsule stats-only {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+        <div class="bottom-nav-capsule stats-only {% if request.resolver_match.app_name == 'reports' %}active{% endif %}" data-nav-app="reports">
             <a href="{% url 'reports:statistics' %}" 
                hx-get="{% url 'reports:statistics' %}" 
                hx-target="#main-content" 
@@ -89,3 +89,54 @@
         </div>
     </div>
 </nav>
+
+<script>
+(function() {
+    // Map URL patterns to app names
+    const urlToApp = {
+        '/sales/': 'sales',
+        '/expenses/': 'expenses',
+        '/batches/': 'batches',
+        '/reports/': 'reports',
+        '/statistics': 'reports'
+    };
+
+    function getAppFromUrl(url) {
+        for (const [pattern, app] of Object.entries(urlToApp)) {
+            if (url.includes(pattern)) {
+                return app;
+            }
+        }
+        return null;
+    }
+
+    function updateActiveNav() {
+        const currentPath = window.location.pathname;
+        const currentApp = getAppFromUrl(currentPath);
+        
+        document.querySelectorAll('.bottom-nav-capsule').forEach(capsule => {
+            const capsuleApp = capsule.dataset.navApp;
+            if (capsuleApp === currentApp) {
+                capsule.classList.add('active');
+            } else {
+                capsule.classList.remove('active');
+            }
+        });
+    }
+
+    // Update on HTMX navigation
+    document.body.addEventListener('htmx:afterSettle', function(event) {
+        updateActiveNav();
+        // Re-initialize Lucide icons if needed
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+
+    // Also handle browser back/forward buttons
+    window.addEventListener('popstate', updateActiveNav);
+
+    // Initial check on page load
+    document.addEventListener('DOMContentLoaded', updateActiveNav);
+})();
+</script>
