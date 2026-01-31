@@ -73,29 +73,34 @@ input[type=number] {
     right: 0;
     z-index: 50;
     background: var(--nav-bg);
-    padding: 10px 12px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    padding: 2.5% 3%;
+    padding-bottom: calc(2.5% + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
 }
 
 /* Inner container */
 .bottom-nav-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: stretch;
-    gap: 10px;
-    max-width: 420px;
+    gap: 2%;
+    width: 100%;
+    max-width: 100%;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 /* Capsule base */
 .bottom-nav-capsule {
     display: flex;
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
+    max-width: 25%;
     background: var(--nav-item-bg);
     border-radius: 12px;
     overflow: hidden;
     transition: all 0.2s ease;
+    box-sizing: border-box;
 }
 
 /* Active state */
@@ -117,12 +122,15 @@ input[type=number] {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex: 1;
-    padding: 10px 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8% 5%;
     text-decoration: none;
     color: var(--nav-text);
     transition: all 0.15s ease;
-    gap: 4px;
+    gap: 2px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .capsule-main:hover {
@@ -143,13 +151,14 @@ input[type=number] {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    width: 44px;
-    min-width: 44px;
-    padding: 6px;
+    flex: 0 0 auto;
+    width: 30%;
+    min-width: 0;
+    padding: 4%;
     background: transparent;
     text-decoration: none;
     border-left: 1px solid var(--nav-border);
+    box-sizing: border-box;
 }
 
 /* Add button - the actual nested button */
@@ -157,10 +166,12 @@ input[type=number] {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 28px;
+    max-height: 28px;
     background: var(--nav-add-bg);
-    border-radius: 8px;
+    border-radius: 6px;
     color: var(--nav-text);
     transition: all 0.15s ease;
 }
@@ -176,30 +187,37 @@ input[type=number] {
 
 /* Stats-only capsule (no add button) */
 .stats-only {
-    max-width: 70px;
+    max-width: 18%;
+    flex: 0 0 auto;
 }
 
 /* Icons */
 .capsule-icon {
-    width: 22px;
-    height: 22px;
+    width: clamp(16px, 5vw, 22px);
+    height: clamp(16px, 5vw, 22px);
+    flex-shrink: 0;
     stroke-width: 1.75;
     color: var(--nav-text);
     transition: color 0.15s ease;
 }
 
 .add-icon {
-    width: 18px;
-    height: 18px;
+    width: clamp(14px, 4vw, 18px);
+    height: clamp(14px, 4vw, 18px);
+    flex-shrink: 0;
     stroke-width: 2;
 }
 
 /* Labels */
 .capsule-label {
-    font-size: 10px;
+    font-size: clamp(7px, 2.5vw, 10px);
     font-weight: 500;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 /* Mobile content padding to account for bottom nav */
