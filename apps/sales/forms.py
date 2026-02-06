@@ -36,11 +36,23 @@ class SaleForm(forms.ModelForm):
                 'hx-get': '/customers/autocomplete/',
                 'hx-trigger': 'keyup changed delay:500ms',
                 'hx-target': '#customer-results',
-                'autocomplete': 'off'
+                'autocomplete': 'off',
+                'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2',
+                'placeholder': 'Enter customer name'
             }),
-            'notes': forms.Textarea(attrs={'rows': 2}),
-            'unit_price': forms.NumberInput(attrs={'inputmode': 'numeric', 'step': '0.01'}),
-            'quantity': forms.NumberInput(attrs={'inputmode': 'numeric'}),
+            'notes': forms.Textarea(attrs={
+                'rows': 2,
+                'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2'
+            }),
+            'unit_price': forms.NumberInput(attrs={
+                'inputmode': 'numeric', 
+                'step': '0.01',
+                'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2'
+            }),
+            'quantity': forms.NumberInput(attrs={
+                'inputmode': 'numeric',
+                'class': 'mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2'
+            }),
         }
     
     def __init__(self, *args, **kwargs):
