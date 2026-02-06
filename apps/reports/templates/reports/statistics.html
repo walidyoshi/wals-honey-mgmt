@@ -4,12 +4,12 @@
 {% block title %}Statistics{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Statistics</h1>
+<div class="mb-3">
+    <h1 class="text-lg sm:text-2xl font-bold text-gray-800">Statistics</h1>
 </div>
 
-<!-- Date Filters -->
-<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-6">
+<!-- Desktop Date Filters (hidden on mobile) -->
+<div class="hidden md:block bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-6">
     <form method="get" class="space-y-4">
         <!-- Quick Presets -->
         <div class="flex flex-wrap gap-2">
@@ -61,25 +61,67 @@
     </form>
 </div>
 
+<!-- Mobile Compact Filter -->
+<div class="md:hidden mb-4 space-y-2">
+    <!-- Quick Presets - Horizontal scroll -->
+    <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <a href="?preset=this_week" 
+            class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+                {% if current_preset == 'this_week' %}bg-indigo-600 text-white{% else %}bg-white text-gray-600 border border-gray-300{% endif %}">
+            This Week
+        </a>
+        <a href="?preset=last_week" 
+            class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+                {% if current_preset == 'last_week' %}bg-indigo-600 text-white{% else %}bg-white text-gray-600 border border-gray-300{% endif %}">
+            Last Week
+        </a>
+        <a href="?preset=this_month" 
+            class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+                {% if current_preset == 'this_month' %}bg-indigo-600 text-white{% else %}bg-white text-gray-600 border border-gray-300{% endif %}">
+            This Month
+        </a>
+        <a href="?preset=last_month" 
+            class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+                {% if current_preset == 'last_month' %}bg-indigo-600 text-white{% else %}bg-white text-gray-600 border border-gray-300{% endif %}">
+            Last Month
+        </a>
+        <a href="{% url 'reports:statistics' %}" 
+            class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+                {% if current_preset == 'all' %}bg-indigo-600 text-white{% else %}bg-white text-gray-600 border border-gray-300{% endif %}">
+            All Time
+        </a>
+    </div>
+    <!-- Date Range Row -->
+    <form method="get" class="flex gap-2">
+        <input type="date" name="date_from" value="{{ date_from_str }}"
+            class="flex-1 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-2 py-1.5">
+        <input type="date" name="date_to" value="{{ date_to_str }}"
+            class="flex-1 rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm px-2 py-1.5">
+        <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded-md text-sm whitespace-nowrap">
+            Apply
+        </button>
+    </form>
+</div>
+
 <!-- Date Range Display -->
 {% if date_from and date_to %}
-<div class="mb-4 text-sm text-gray-600">
-    Showing data from <span class="font-medium">{{ date_from|date:"M d, Y" }}</span> 
-    to <span class="font-medium">{{ date_to|date:"M d, Y" }}</span>
+<div class="mb-3 text-xs sm:text-sm text-gray-600">
+    <span class="font-medium">{{ date_from|date:"M d, Y" }}</span> - 
+    <span class="font-medium">{{ date_to|date:"M d, Y" }}</span>
 </div>
 {% endif %}
 
-<!-- Statistics Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+<!-- Statistics Cards - 2 per row on mobile -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-4">
     <!-- Total Sales -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-3 sm:p-6">
         <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Sales</p>
-                <p class="mt-2 text-3xl font-bold text-gray-900">₦{{ total_sales|intcomma }}</p>
+            <div class="min-w-0 flex-1">
+                <p class="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider truncate">Sales</p>
+                <p class="mt-1 sm:mt-2 text-lg sm:text-3xl font-bold text-gray-900">₦{{ total_sales|intcomma }}</p>
             </div>
-            <div class="p-3 bg-green-100 rounded-full">
-                <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="p-2 sm:p-3 bg-green-100 rounded-full ml-2 flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-8 sm:h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -88,14 +130,14 @@
     </div>
     
     <!-- Total Expenses -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-3 sm:p-6">
         <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Expenses</p>
-                <p class="mt-2 text-3xl font-bold text-gray-900">₦{{ total_expenses|intcomma }}</p>
+            <div class="min-w-0 flex-1">
+                <p class="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider truncate">Expenses</p>
+                <p class="mt-1 sm:mt-2 text-lg sm:text-3xl font-bold text-gray-900">₦{{ total_expenses|intcomma }}</p>
             </div>
-            <div class="p-3 bg-red-100 rounded-full">
-                <svg class="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="p-2 sm:p-3 bg-red-100 rounded-full ml-2 flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-8 sm:h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                         d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
@@ -104,49 +146,47 @@
     </div>
     
     <!-- Total Batch Cost -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-3 sm:p-6">
         <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Batch Cost</p>
-                <p class="mt-2 text-3xl font-bold text-gray-900">₦{{ total_batch_cost|intcomma }}</p>
+            <div class="min-w-0 flex-1">
+                <p class="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider truncate">Batch Cost</p>
+                <p class="mt-1 sm:mt-2 text-lg sm:text-3xl font-bold text-gray-900">₦{{ total_batch_cost|intcomma }}</p>
             </div>
-            <div class="p-3 bg-blue-100 rounded-full">
-                <svg class="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="p-2 sm:p-3 bg-blue-100 rounded-full ml-2 flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-8 sm:h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                         d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Sales Collection Status -->
-<div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Sales Collection Status</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Collected -->
-        <div class="flex items-center p-4 bg-green-50 rounded-lg border border-green-100">
-            <div class="p-3 bg-green-100 rounded-full mr-4">
-                <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    
+    <!-- Collected -->
+    <div class="bg-green-50 rounded-lg border border-green-100 p-3 sm:p-6">
+        <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+                <p class="text-xs sm:text-sm font-medium text-green-800 truncate">Collected</p>
+                <p class="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-green-900">₦{{ sales_collected|intcomma }}</p>
+            </div>
+            <div class="p-2 sm:p-3 bg-green-100 rounded-full ml-2 flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
             </div>
-            <div>
-                <p class="text-sm font-medium text-green-800">Collected</p>
-                <p class="text-2xl font-bold text-green-900">₦{{ sales_collected|intcomma }}</p>
-            </div>
         </div>
-        
-        <!-- Pending -->
-        <div class="flex items-center p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-            <div class="p-3 bg-yellow-100 rounded-full mr-4">
-                <svg class="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    </div>
+    
+    <!-- Pending -->
+    <div class="bg-yellow-50 rounded-lg border border-yellow-100 p-3 sm:p-6">
+        <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+                <p class="text-xs sm:text-sm font-medium text-yellow-800 truncate">Pending</p>
+                <p class="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-yellow-900">₦{{ sales_pending|intcomma }}</p>
+            </div>
+            <div class="p-2 sm:p-3 bg-yellow-100 rounded-full ml-2 flex-shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-yellow-800">Pending</p>
-                <p class="text-2xl font-bold text-yellow-900">₦{{ sales_pending|intcomma }}</p>
             </div>
         </div>
     </div>
